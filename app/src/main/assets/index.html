@@ -2,16 +2,18 @@
 <html lang="pl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <style>
     * {
       box-sizing: border-box;
     }
     body {
-      font-family: system-ui, Arial, sans-serif;
+      font-family: system-ui, -apple-system, Arial, sans-serif;
       background: #f5f7f5;
       color: #17291f;
       margin: 0;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
     }
     header {
       background: #176b52;
@@ -25,7 +27,6 @@
     }
     main {
       padding: 16px;
-      padding-bottom: 120px !important; /* Zapewnia widoczność dolnych przycisków nad nawigacją */
     }
     section[hidden], div[hidden] {
       display: none !important;
@@ -126,17 +127,33 @@
     .nav {
       position: fixed;
       bottom: 0;
-      background: white;
-      width: 100%;
-      padding: 10px 15px 18px;
+      left: 0;
+      right: 0;
+      background: #ffffff;
       display: flex;
       justify-content: space-around;
-      box-shadow: 0 -2px 12px #0001;
+      align-items: center;
+      padding-top: 10px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+      border-top: 1px solid #e2ebe6;
       z-index: 1000;
     }
     .nav button {
       background: transparent;
+      border: none;
       color: #176b52;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 16px;
+    }
+    .nav button span.icon {
+      font-size: 20px;
+      line-height: 1;
     }
     #notice {
       color: #b53b2f;
@@ -222,9 +239,9 @@
   </main>
 
   <nav class="nav">
-    <button onclick="go('home')">⌂ Rachunki</button>
-    <button onclick="edit(null)">＋ Dodaj</button>
-    <button onclick="go('settings')">⚙ Ustawienia</button>
+    <button onclick="go('home')"><span class="icon">⌂</span>Rachunki</button>
+    <button onclick="edit(null)"><span class="icon">＋</span>Dodaj</button>
+    <button onclick="go('settings')"><span class="icon">⚙</span>Ustawienia</button>
   </nav>
 
   <script src="app.js"></script>
