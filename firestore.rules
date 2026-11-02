@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signed() { return request.auth != null; }
+  function family(fid) { return get(/databases/$(database)/documents/families/$(fid)); }
+  function owner(fid) { return signed() && family(fid).data.ownerUid == request.auth.uid; }
+  function member(fid) { return signed() && exists(/databases/$(database)/documents/families/$(fid)/members/$(request.auth.uid)); }
+  match /families/{fid} {
+   allow create: if signed() && request.resource.data.ownerUid == request.auth.uid;
+   allow read: if member(fid) || owner(fid);
+   allow update, delete: if owner(fid);
+   match /members/{uid} {
+    allow read: if signed() && (request.auth.uid == uid || owner(fid));
+    allow create, update, delete: if owner(fid) || (signed() && request.auth.uid == uid && owner(fid));
+   }
+   match /requests/{uid} {
+    allow create: if signed() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['displayName']) && request.resource.data.displayName is string && request.resource.data.displayName.size() <= 120;
+    allow read, delete: if owner(fid) || (signed() && request.auth.uid == uid);
+    allow update: if false;
+   }
+   match /data/{doc} {
+    allow read, write: if member(fid);
+   }
+  }
+ }
+}
