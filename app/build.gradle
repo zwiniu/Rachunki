@@ -9,8 +9,25 @@ android {
         applicationId 'pl.rodzina.rachunki'
         minSdk 26
         targetSdk 35
-        versionCode 1
+        versionCode((project.findProperty('releaseVersionCode') ?: '1').toString().toInteger())
         versionName '1.0'
+    }
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv('RELEASE_KEYSTORE_FILE')
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storeType 'JKS'
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
     }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
