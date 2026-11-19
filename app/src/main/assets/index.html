@@ -42,10 +42,16 @@
     }
     .stat {
       background: white;
+      color: inherit;
+      font: inherit;
+      text-align: left;
       border-radius: 16px;
       padding: 15px;
       flex: 1;
       min-width: 0;
+    }
+    .stat:focus-visible {
+      outline: 2px solid #176b52;
     }
     .stat strong {
       display: block;
@@ -184,6 +190,18 @@
       </div>
     </section>
 
+    <section id="paid" hidden>
+      <h2>Zapłacone rachunki</h2>
+      <button class="secondary" onclick="go('home')">Wróć do wszystkich rachunków</button>
+      <div id="paidList"></div>
+    </section>
+
+    <section id="unpaid" hidden>
+      <h2>Do zapłaty</h2>
+      <button class="secondary" onclick="go('home')">Wróć do wszystkich rachunków</button>
+      <div id="unpaidList"></div>
+    </section>
+
     <section id="edit" hidden>
       <h2 id="formTitle">Nowy rachunek</h2>
       <label>Nazwa rachunku</label>
@@ -205,7 +223,7 @@
       </select>
       
       <button class="primary" onclick="submitBill()">Zapisz rachunek</button>
-      <button class="secondary primary" onclick="go('home')">Anuluj</button>
+      <button class="secondary primary" onclick="goBack()">Anuluj</button>
     </section>
 
     <section id="settings" hidden>

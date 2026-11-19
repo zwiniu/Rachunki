@@ -9,6 +9,8 @@ import android.widget.*;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 import org.json.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import android.provider.Settings;
 import android.net.Uri;
@@ -32,6 +34,7 @@ public class MainActivity extends Activity {
   web.getSettings().setAllowFileAccess(true);web.getSettings().setDomStorageEnabled(true);
   web.addJavascriptInterface(new Bridge(),"Android");
   web.setWebViewClient(new WebViewClient(){@Override public void onPageFinished(WebView v,String url){refreshState();}});
+  web.setWebChromeClient(new WebChromeClient());
   setContentView(web);web.loadUrl("file:///android_asset/index.html");
   if(auth.getCurrentUser()!=null)initializeFamily();
  }
@@ -156,6 +159,29 @@ public class MainActivity extends Activity {
   @JavascriptInterface public void approveMember(String id){handler.post(()->MainActivity.this.approve(id));}
   @JavascriptInterface public void pickDate(String date){handler.post(()->{
    try{String[] p=date.split("-");DatePickerDialog d=new DatePickerDialog(MainActivity.this,(v,y,m,day)->js("nativeDate",String.format(Locale.US,"%04d-%02d-%02d",y,m+1,day)),Integer.parseInt(p[0]),Integer.parseInt(p[1])-1,Integer.parseInt(p[2]));d.show();}catch(Exception ignored){}
+  });}
+  @JavascriptInterface public void pickPaymentDate(String token,String date){handler.post(()->{
+   LocalDate today=LocalDate.now();
+   LocalDate selected=today;
+   if(!date.isEmpty()){
+    try{
+     LocalDate previous=LocalDate.parse(date);
+     if(previous.getYear()>0&&!previous.isAfter(today))selected=previous;
+    }catch(DateTimeParseException ignored){}
+   }
+   DatePickerDialog dialog=new DatePickerDialog(MainActivity.this,R.style.PaymentDatePicker,
+    (view,y,m,day)->js("nativePaymentDate",token,LocalDate.of(y,m+1,day).toString()),
+    today.getYear(),today.getMonthValue()-1,today.getDayOfMonth());
+   Calendar firstDay=Calendar.getInstance();
+   firstDay.clear();
+   firstDay.set(1,Calendar.JANUARY,1);
+   dialog.getDatePicker().setMinDate(firstDay.getTimeInMillis());
+   dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+   dialog.updateDate(selected.getYear(),selected.getMonthValue()-1,selected.getDayOfMonth());
+   dialog.setTitle("Data zapłaty");
+   dialog.setButton(DialogInterface.BUTTON_POSITIVE,"Zapisz",dialog);
+   dialog.setButton(DialogInterface.BUTTON_NEGATIVE,"Anuluj",(window,which)->window.cancel());
+   dialog.show();
   });}
   @JavascriptInterface public void pickTime(String time){handler.post(()->{
    try{String[] p=time.split(":");new TimePickerDialog(MainActivity.this,(v,h,m)->js("nativeTime",String.format(Locale.US,"%02d:%02d",h,m)),Integer.parseInt(p[0]),Integer.parseInt(p[1]),true).show();}catch(Exception ignored){}
