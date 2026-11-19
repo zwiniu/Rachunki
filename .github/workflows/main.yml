@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "ci/rachunki-payment-dates" ]
   workflow_dispatch:
 
 jobs:
